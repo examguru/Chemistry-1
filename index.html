@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>टेस्ट सीरीज़</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .ad-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+            background-color: #f0f0f0;
+            padding: 5px 0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+            box-sizing: border-box;
+            margin: 10px 0;
+        }
+        h1, h2 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        #mainQuizHeading { display: none; }
+        #quizTitle { display: none; }
+
+        .name-input-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .name-input-section label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        .name-input-section input[type="text"] {
+            width: calc(100% - 40px);
+            padding: 12px 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+            max-width: 300px;
+            margin-bottom: 20px;
+        }
+        .name-input-section button {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease;
+        }
+        .name-input-section button:hover {
+            background-color: #218838;
+        }
+
+        /* Quiz Section Styles */
+        .quiz-section {
+            display: none;
+        }
+        .question-number {
+            text-align: right;
+            font-size: 0.9em;
+            color: #777;
+            margin-bottom: 10px;
+        }
+        .question-content {
+            margin-bottom: 25px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        .question-content p {
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.05em;
+            line-height: 1.5;
+        }
+        .options label {
+            display: block;
+            margin-bottom: 10px;
+            cursor: pointer;
+            padding: 10px 15px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+        .options label:hover {
+            background-color: #e9e9e9;
+            border-color: #ccc;
+        }
+        .options input[type="radio"] {
+            margin-right: 10px;
+            pointer-events: none;
+            visibility: hidden;
+            width: 0;
+            height: 0;
+        }
+        .options label::before {
+            content: '';
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ccc;
+            border-radius: 50%;
+            margin-right: 10px;
+            vertical-align: middle;
+            transition: all 0.2s ease;
+        }
+        .options input[type="radio"]:checked + span::before {
+            background-color: #007bff;
+            border-color: #007bff;
+            box-shadow: inset 0 0 0 4px white;
+        }
+
+        /* Feedback styling */
+        .options label.correct-answer-feedback {
+            background-color: #e6ffe6;
+            border-color: #28a745;
+        }
+        .options label.incorrect-answer-feedback {
+            background-color: #ffe6e6;
+            border-color: #dc3545;
+        }
+        .options label span.option-text {
+            vertical-align: middle;
+        }
+        
+        .action-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.2em;
+            margin-top: 30px;
+            transition: background-color 0.3s ease;
+        }
+        .action-btn:hover {
+            background-color: #0056b3;
+        }
+        .skip-btn {
+            background-color: #6c757d;
+            margin-top: 10px;
+        }
+        .skip-btn:hover {
+            background-color: #5a6268;
+        }
+
+        /* Results Section Styles */
+        .results-section {
+            display: none;
+            margin-top: 30px;
+            border-top: 2px solid #eee;
+            padding-top: 20px;
+            text-align: center;
+        }
+        .results-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .results-section p {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        .score {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .score-details {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+        .score-card {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .score-item:last-child {
+            border-bottom: none;
+        }
+        .score-label {
+            font-weight: bold;
+        }
+        .correct-score {
+            color: #28a745;
+        }
+        .incorrect-score {
+            color: #dc3545;
+        }
+        .skipped-score {
+            color: #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Ad -->
+    <div class="ad-container">
+        <script type="text/javascript">
+            atOptions = {
+                'key' : '4b505c9273cf9161c278efee028f35e2',
+                'format' : 'iframe',
+                'height' : 50,
+                'width' : 320,
+                'params' : {}
+            };
+        </script>
+        <script type="text/javascript" src="//www.highperformanceformat.com/4b505c9273cf9161c278efee028f35e2/invoke.js"></script>
+    </div>
+
+    <div class="container">
+        <h1 id="mainQuizHeading"></h1> 
+        <div class="name-input-section" id="nameInputSection">
+            <label for="userName">अपना नाम दर्ज करें:</label>
+            <input type="text" id="userName" placeholder="उदाहरण: राहुल कुमार" required>
+            <button id="startQuizBtn">टेस्ट शुरू करें</button>
+        </div>
+
+        <div class="quiz-section" id="quizSection">
+            <h2 id="quizTitle"></h2> 
+            <p class="question-number">प्रश्न <span id="currentQuestionNum">1</span> / <span id="totalQuestionsDisplayQuiz">0</span></p>
+            <div id="questionContainer">
+                <!-- Single question and options will be rendered here -->
+            </div>
+            <button class="action-btn" id="nextQuestionBtn" style="display: none;">अगला प्रश्न</button>
+            <button class="action-btn skip-btn" id="skipQuestionBtn">इस प्रश्न को छोड़ें</button>
+            <button class="action-btn" id="viewResultsBtn" style="display: none;">परिणाम देखें</button>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <h2>परिणाम</h2>
+            <p>अभ्यर्थी: <span id="displayUserName"></span></p>
+            
+            <div class="score-card">
+                <div class="score">आपका स्कोर: <span id="scoreDisplay">0</span> / <span id="totalQuestionsDisplayResults">0</span></div>
+                
+                <div class="score-details">
+                    <div class="score-item">
+                        <span class="score-label">सही उत्तर:</span>
+                        <span class="correct-score" id="correctCount">0</span>
+                    </div>
+                    <div class="score-item">
+                        <span class="score-label">गलत उत्तर:</span>
+                        <span class="incorrect-score" id="incorrectCount">0</span>
+                    </div>
+                    <div class="score-item">
+                        <span class="score-label">छोड़े गए प्रश्न:</span>
+                        <span class="skipped-score" id="skippedCount">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="action-btn" onclick="location.reload()">दोबारा टेस्ट दें</button>
+        </div>
+    </div>
+
+    <!-- Bottom Ad -->
+    <div class="ad-container">
+        <script type="text/javascript">
+            atOptions = {
+                'key' : '4b505c9273cf9161c278efee028f35e2',
+                'format' : 'iframe',
+                'height' : 50,
+                'width' : 320,
+                'params' : {}
+            };
+        </script>
+        <script type="text/javascript" src="//www.highperformanceformat.com/4b505c9273cf9161c278efee028f35e2/invoke.js"></script>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "1. नारंगी ठोस (A) है:",
+                options: ["(a) सोडियम डायक्रोमेट", "(b) पोटैशियम डायक्रोमेट", "(c) पोटैशियम क्रोमेट", "(d) अमोनियम डायक्रोमेट"],
+                correctAnswer: "(c) पोटैशियम क्रोमेट"
+            },
+            {
+                question: "2. अवक्षेप (B) का सूत्र है:",
+                options: ["(a) CO₂", "(b) CrO₂", "(c) CrO₃", "(d) CrO₄"],
+                correctAnswer: "(c) CrO₃"
+            },
+            {
+                question: "3. उजला ठोस (D) है:",
+                options: ["(a) NH₄Cl", "(b) Mg₃N₂", "(c) NH₄OH", "(d) (NH₄)₂CO₃"],
+                correctAnswer: "(a) NH₄Cl"
+            },
+            {
+                question: "4. निम्नलिखित में कौन क्रिस्टलीय ठोस पदार्थ है?",
+                options: ["(a) हीरा", "(b) ग्रेफाइट", "(c) काँच", "(d) साधारण नमक"],
+                correctAnswer: "(d) साधारण नमक"
+            },
+            {
+                question: "5. निम्नलिखित में कौन बेरवादार ठोस है?",
+                options: ["(a) Graphite (c)", "(b) Quartz Glass (SiO₂)", "(c) Chrome Alum", "(d) Sodium Chloride (NaCl)"],
+                correctAnswer: "(b) Quartz Glass (SiO₂)"
+            },
+            {
+                question: "6. bcc इकाई सेल में मुक्त खाली जगह का प्रतिशत है:",
+                options: ["(a) 32%", "(b) 34%", "(c) 28%", "(d) 30%"],
+                correctAnswer: "(a) 32%"
+            },
+            {
+                question: "7. एक धातु का रवाकरण हेक्सागोनल क्लोज पैक (hcp) संरचना में होता है, तो धातु की कोऑर्डिनेशन संख्या है:",
+                options: ["(a) 12", "(b) 8", "(c) 4", "(d) 6"],
+                correctAnswer: "(a) 12"
+            },
+            {
+                question: "8. निम्नलिखित में कौन-से जोड़े में क्रमशः चतुष्फलकीय वॉइड और अष्टफलकीय वॉइड होता है?",
+                options: ["(a) bcc और fcc", "(b) hcp और simple क्यूबिक", "(c) hcp और ccp", "(d) bcc और hcp"],
+                correctAnswer: "(a) bcc और fcc"
+            },
+            {
+                question: "9. बेरवादार ठोस पदार्थ है?",
+                options: ["(a) ग्रेफाइट", "(b) काँच", "(c) हीरा", "(d) इनमें से सभी"],
+                correctAnswer: "(b) काँच"
+            },
+            {
+                question: "10. hcp इकाई सेल में परमाणुओं की संख्या है:",
+                options: ["(a) 4", "(b) 6", "(c) 7", "(d) 12"],
+                correctAnswer: "(d) 12"
+            },
+            {
+                question: "11. रवादार ठोस है:",
+                options: ["(a) हीरा", "(b) काँच", "(c) रबर", "(d) इनमें से सभी"],
+                correctAnswer: "(a) हीरा"
+            },
+            {
+                question: "12. निम्नलिखित में कौन बेरवादार ठोस का उदाहरण है?",
+                options: ["(a) NaCl", "(b) ZnS", "(c) काँच", "(d) SiC"],
+                correctAnswer: "(c) काँच"
+            },
+            {
+                question: "13. अनुचुम्बकत्व प्रदर्शित करने वाला पदार्थ है:",
+                options: ["(a) H₂O", "(b) O₂", "(c) NaCl", "(d) C₆H₆"],
+                correctAnswer: "(b) O₂"
+            },
+            {
+                question: "14. रवा में जब इलेक्ट्रॉन ऋणायन द्वारा खाली स्थान में पकड़ा लिया जाता है तब कौन-सा दोष होता है?",
+                options: ["(a) शॉर्टकी दोष", "(b) फ्रेंकल दोष", "(c) F-centre", "(d) इनमें से कोई नहीं"],
+                correctAnswer: "(c) F-centre"
+            },
+            {
+                question: "15. बेरवादार ठोस का उदाहरण है:",
+                options: ["(a) हीरा", "(b) ग्रेफाइट", "(c) नमक", "(d) रबर"],
+                correctAnswer: "(d) रबर"
+            },
+            {
+                question: "16. घनाकार क्रिस्टल में ब्रेविस जालकों की संख्या होती है:",
+                options: ["(a) 3", "(b) 1", "(c) 4", "(d) 14"],
+                correctAnswer: "(a) 3"
+            },
+            {
+                question: "17. एक अष्टफलक रिक्ति निम्नलिखित में कितने गोलों से घिरी होती है?",
+                options: ["(a) 4", "(b) 6", "(c) 8", "(d) 12"],
+                correctAnswer: "(b) 6"
+            },
+            {
+                question: "18. निम्नलिखित में किस प्रकार के दोष के कारण क्रिस्टल के घनत्व में कमी होती है?",
+                options: ["(a) फ्रेंकल", "(b) शॉर्टकी", "(c) अंतराली", "(d) F-केन्द्र"],
+                correctAnswer: "(b) शॉर्टकी"
+            },
+            {
+                question: "19. निम्नलिखित में कौन फेरोचुम्बकीय पदार्थ है?",
+                options: ["(a) NaCl", "(b) Fe₂O₃", "(c) O₂", "(d) N₂"],
+                correctAnswer: "(b) Fe₂O₃"
+            },
+            {
+                question: "20. क्रिस्टलीय तंत्र की कुल संख्या होती है?",
+                options: ["(a) 7", "(b) 8", "(c) 6", "(d) 4"],
+                correctAnswer: "(a) 7"
+            },
+            {
+                question: "21. निम्नलिखित में से कौन सहसंयोजक ठोस है?",
+                options: ["(a) लोहा", "(b) हीरा", "(c) सोडियम क्लोराइड", "(d) तांबा"],
+                correctAnswer: "(b) हीरा"
+            },
+            {
+                question: "22. किसी धातु की षट्भुजीय सीमित पैकिंग संरचना में समन्वय संख्या होती है?",
+                options: ["(a) 5", "(b) 4", "(c) 8", "(d) 12"],
+                correctAnswer: "(d) 12"
+            },
+            {
+                question: "23. हीरा निम्नलिखित में किस प्रकार का है?",
+                options: ["(a) आयनिक रवा", "(b) सहसंयोजक रवा", "(c) आणविक रवा", "(d) धातुई रवा"],
+                correctAnswer: "(b) सहसंयोजक रवा"
+            },
+            {
+                question: "24. NaCl रवा की संरचना है:",
+                options: ["(a) परकोणीय बंध रैंकिंग", "(b) फलक केंद्रित घनाकार", "(c) वर्ग समतलीय", "(d) पिंड केंद्रित घनाकार"],
+                correctAnswer: "(b) फलक केंद्रित घनाकार"
+            },
+            {
+                question: "25. निम्नलिखित में कौन रवाहीन ठोस है?",
+                options: ["(a) हीरा", "(b) ग्रेफाइट", "(c) साधारण नमक", "(d) काँच"],
+                correctAnswer: "(d) काँच"
+            },
+            {
+                question: "26. पिंड-केंद्रित घनाकार इकाई सेल में परमाणुओं की संख्या होती है:",
+                options: ["(a) 2", "(b) 3", "(c) 4", "(d) 12"],
+                correctAnswer: "(a) 2"
+            },
+            {
+                question: "27. निम्नलिखित में कौन रवादार ठोस नहीं है?",
+                options: ["(a) KCl", "(b) CsCl", "(c) ग्लास", "(d) रम्बिक सल्फर"],
+                correctAnswer: "(c) ग्लास"
+            },
+            {
+                question: "28. एक क्रिस्टल में कितने प्रकार के ब्रेवस जालक संभव है?",
+                options: ["(a) 23", "(b) 7", "(c) 30", "(d) 14"],
+                correctAnswer: "(d) 14"
+            }
+        ];
+
+        // DOM elements
+        const nameInputSection = document.getElementById('nameInputSection');
+        const quizSection = document.getElementById('quizSection');
+        const resultsSection = document.getElementById('resultsSection');
+        const userNameInput = document.getElementById('userName');
+        const startQuizBtn = document.getElementById('startQuizBtn');
+        const questionContainer = document.getElementById('questionContainer');
+        const nextQuestionBtn = document.getElementById('nextQuestionBtn');
+        const skipQuestionBtn = document.getElementById('skipQuestionBtn');
+        const viewResultsBtn = document.getElementById('viewResultsBtn');
+        const currentQuestionNum = document.getElementById('currentQuestionNum');
+        const totalQuestionsDisplayQuiz = document.getElementById('totalQuestionsDisplayQuiz');
+        const displayUserName = document.getElementById('displayUserName');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const totalQuestionsDisplayResults = document.getElementById('totalQuestionsDisplayResults');
+        const correctCount = document.getElementById('correctCount');
+        const incorrectCount = document.getElementById('incorrectCount');
+        const skippedCount = document.getElementById('skippedCount');
+
+        // Global variables
+        let userName = '';
+        let currentQuestionIndex = 0;
+        let userAttempts = []; // To store user's answer for each question
+        const totalQuestions = questions.length;
+
+        // --- Functions ---
+
+        // Function to render a single question
+        function renderQuestion() {
+            if (currentQuestionIndex >= totalQuestions) {
+                showResults();
+                return;
+            }
+
+            questionContainer.innerHTML = ''; // Clear previous question
+            const q = questions[currentQuestionIndex];
+
+            const questionDiv = document.createElement('div');
+            questionDiv.classList.add('question-content');
+            questionDiv.innerHTML = `<p>${q.question}</p>`;
+            
+            const optionsDiv = document.createElement('div');
+            optionsDiv.classList.add('options');
+
+            q.options.forEach((option, optionIndex) => {
+                const optionId = `q${currentQuestionIndex}-option${optionIndex}`;
+                const label = document.createElement('label');
+                label.setAttribute('for', optionId);
+                // The radio button itself is hidden; span acts as the clickable area
+                label.innerHTML = `<input type="radio" name="currentQuestion" value="${option}" id="${optionId}"> <span class="option-text">${option}</span>`;
+                
+                // Add click listener to the label for feedback
+                label.addEventListener('click', () => handleAnswerSelection(option, label, optionId));
+                optionsDiv.appendChild(label);
+            });
+
+            questionDiv.appendChild(optionsDiv);
+            questionContainer.appendChild(questionDiv);
+
+            // Update question number display
+            currentQuestionNum.textContent = currentQuestionIndex + 1;
+            totalQuestionsDisplayQuiz.textContent = totalQuestions;
+            totalQuestionsDisplayResults.textContent = totalQuestions;
+
+            // Hide action buttons until an answer is selected
+            nextQuestionBtn.style.display = 'none';
+            viewResultsBtn.style.display = 'none';
+            skipQuestionBtn.style.display = 'block';
+        }
+
+        // Function to handle answer selection and provide feedback
+        function handleAnswerSelection(selectedOptionValue, selectedLabel, optionId) {
+            // If an answer has already been selected for this question, do nothing
+            if (userAttempts[currentQuestionIndex]) {
+                return;
+            }
+
+            const currentQ = questions[currentQuestionIndex];
+            const allOptionLabels = questionContainer.querySelectorAll('.options label');
+            let isCorrect = (selectedOptionValue === currentQ.correctAnswer);
+            
+            // Disable all options after selection
+            allOptionLabels.forEach(label => {
+                label.style.pointerEvents = 'none'; // Prevent further clicks
+                // Make the hidden radio button checked for the selected option
+                const radio = label.querySelector('input[type="radio"]');
+                if (radio && label.getAttribute('for') === optionId) {
+                    radio.checked = true; 
+                }
+            });
+
+            // Provide visual feedback
+            if (isCorrect) {
+                selectedLabel.classList.add('correct-answer-feedback');
+            } else {
+                selectedLabel.classList.add('incorrect-answer-feedback');
+                // Highlight the correct answer as well
+                allOptionLabels.forEach(label => {
+                    const optionText = label.querySelector('.option-text').textContent;
+                    if (optionText === currentQ.correctAnswer) {
+                        label.classList.add('correct-answer-feedback');
+                    }
+                });
+            }
+
+            // Store the user's attempt
+            userAttempts[currentQuestionIndex] = {
+                question: currentQ.question,
+                userAnswer: selectedOptionValue,
+                correctAnswer: currentQ.correctAnswer,
+                isCorrect: isCorrect,
+                skipped: false
+            };
+
+            // Show next/submit button
+            if (currentQuestionIndex < totalQuestions - 1) {
+                nextQuestionBtn.style.display = 'block';
+            } else {
+                viewResultsBtn.style.display = 'block';
+            }
+            
+            // Hide skip button after answering
+            skipQuestionBtn.style.display = 'none';
+        }
+
+        // Function to skip the current question
+        function skipQuestion() {
+            const currentQ = questions[currentQuestionIndex];
+            
+            // Store the skipped attempt
+            userAttempts[currentQuestionIndex] = {
+                question: currentQ.question,
+                userAnswer: "प्रश्न छोड़ा गया",
+                correctAnswer: currentQ.correctAnswer,
+                isCorrect: false,
+                skipped: true
+            };
+
+            // Move to next question
+            currentQuestionIndex++;
+            renderQuestion();
+        }
+
+        // Function to show final results
+        function showResults() {
+            quizSection.style.display = 'none';
+            resultsSection.style.display = 'block';
+            
+            let score = 0;
+            let correct = 0;
+            let incorrect = 0;
+            let skipped = 0;
+            
+            userAttempts.forEach((item) => {
+                if (item.isCorrect) {
+                    score++;
+                    correct++;
+                } else if (item.skipped) {
+                    skipped++;
+                } else {
+                    incorrect++;
+                }
+            });
+
+            scoreDisplay.textContent = score;
+            correctCount.textContent = correct;
+            incorrectCount.textContent = incorrect;
+            skippedCount.textContent = skipped;
+            displayUserName.textContent = userName;
+            totalQuestionsDisplayResults.textContent = totalQuestions;
+        }
+
+        // --- Event Listeners ---
+
+        // Start Quiz button click
+        startQuizBtn.addEventListener('click', () => {
+            userName = userNameInput.value.trim();
+            if (userName === '') {
+                alert('कृपया अपना नाम दर्ज करें!');
+                return;
+            }
+            nameInputSection.style.display = 'none';
+            quizSection.style.display = 'block';
+            renderQuestion();
+        });
+
+        // Next Question button click
+        nextQuestionBtn.addEventListener('click', () => {
+            currentQuestionIndex++;
+            renderQuestion();
+        });
+
+        // Skip Question button click
+        skipQuestionBtn.addEventListener('click', skipQuestion);
+
+        // View Results button click (for the last question)
+        viewResultsBtn.addEventListener('click', showResults);
+    </script>
+</body>
+</html>
